@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  host: n8n-n8n.apps-crc.testing
+  port:
+    targetPort: 5678
+  to:
+    kind: Service
+    name: n8n
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

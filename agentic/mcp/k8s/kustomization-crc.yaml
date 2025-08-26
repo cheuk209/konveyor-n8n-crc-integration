@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - k8smcp-namespace.yaml
+  - k8smcp-serviceaccount.yaml
+  - k8smcp-ca-clusterrolebinding.yaml
+  - k8smcp-deployment-crc.yaml
+  - k8smcp-internal-service.yaml
+  - k8smcp-route.yaml
+  - k8smcp-scc.yaml
+  # Remove or comment out if not using private registry
+  # - quay-io-dkcapgemini-image-pull.yaml

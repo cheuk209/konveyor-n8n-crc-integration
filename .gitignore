@@ -1,0 +1,91 @@
+# Security - NEVER commit these files
+.env*
+.secrets/
+*.env
+*.env.*
+
+# Kubernetes sensitive files
+*kubeconfig*
+*.kubeconfig
+*-kubeconfig.yaml
+config
+.kube/
+
+# Secrets and credentials
+*-secret.yaml
+*-secrets.yaml
+*image-pull*.yaml
+*credentials*
+*password*
+*token*
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cer
+*.pfx
+*.p12
+
+# Azure specific
+*.azmk8s.io*
+azure-config.yaml
+azure-credentials.json
+
+# Container registry secrets
+*docker-registry*.yaml
+*quay-io*.yaml
+*dockerconfigjson*
+
+# Temporary and backup files
+*.backup
+*.bak
+*.tmp
+*.swp
+*.orig
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Archives
+*.tar.gz
+*.zip
+*.7z
+*.rar
+# Security - Never commit secrets
+.env.secrets
+.secrets/
+*.kubeconfig
+crc-kubeconfig.yaml
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# IDE
+.vscode/
+.idea/

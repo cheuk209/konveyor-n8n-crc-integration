@@ -1,0 +1,10 @@
+resources:
+
+  - k8smcp-namespace.yaml
+  - k8smcp-serviceaccount.yaml
+  - k8smcp-ca-clusterrolebinding.yaml
+  - quay-io-dkcapgemini-image-pull.yaml
+  - k8smcp-kubeconfig.yaml
+  - k8smcp-deployment.yaml
+  - k8smcp-internal-service.yaml
+  - k8smcp-external-service.yaml

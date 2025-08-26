@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8smcp
+  namespace: k8smcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcpk8s
+  template:
+    metadata:
+      labels:
+        app: mcpk8s
+    spec:
+      containers:
+      - image: quay.io/dkcapgemini/mcpk8s:0.0.49
+        imagePullPolicy: IfNotPresent
+        name: mcpk8s
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        # Use in-cluster config - ServiceAccount will provide authentication
+        - name: KUBERNETES_SERVICE_HOST
+          value: "kubernetes.default.svc"
+        - name: KUBERNETES_SERVICE_PORT
+          value: "443"
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      imagePullSecrets:
+      - name: quay-io-dkcapgemini
+      serviceAccount: k8smcp
+      serviceAccountName: k8smcp
+      # Remove the configMap volume mount - use ServiceAccount instead

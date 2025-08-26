@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: k8smcp
+  namespace: k8smcp
+spec:
+  host: k8smcp-k8smcp.apps-crc.testing
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: k8smcp-internal
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

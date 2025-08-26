@@ -1,0 +1,18 @@
+FROM alpine:3.22.1 AS downloader
+
+ARG MCP_VERSION
+
+RUN apk add --no-cache curl
+
+RUN curl -L https://github.com/containers/kubernetes-mcp-server/releases/download/${MCP_VERSION}/kubernetes-mcp-server-linux-amd64 \
+    -o /kubernetes-mcp-server && \
+    chmod +x /kubernetes-mcp-server
+
+FROM alpine:3.22.1
+
+RUN mkdir /mcp
+
+COPY --from=downloader /kubernetes-mcp-server /mcp/kubernetes-mcp-server
+
+ENTRYPOINT ["./mcp/kubernetes-mcp-server", "--port", "8080", "--log-level", "4"]
+
