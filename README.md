@@ -29,16 +29,11 @@ Choose your deployment method based on your system:
 
 #### Option 1: OpenShift CRC (Recommended for local development)
 ```bash
-# For Mac M1/ARM64 users:
+# For any architecture (Mac M1, Intel, Linux):
 crc config set memory 12288
 crc start
 eval $(crc oc-env)
 cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k . && cd ../../..
-
-# For Intel/AMD64 users:  
-crc start --memory 12288
-eval $(crc oc-env)
-oc apply -k agentic/mcp/k8s/
 ```
 
 #### Option 2: Standard Kubernetes
@@ -70,11 +65,10 @@ Once deployed, you can chat with your AI agent to manage Kubernetes resources us
 
 | System | Platform | Command | Notes |
 |--------|----------|---------|-------|
-| **Mac M1** | CRC | `cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k .` | ARM64 with init container |
-| **Intel Mac** | CRC | `oc apply -k agentic/mcp/k8s/` | Uses default kustomization |
-| **ARM64 Linux** | K8s | `cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k .` | ARM64 binary download |
-| **AMD64 Linux** | K8s | `kubectl apply -k agentic/mcp/k8s/` | Private registry image |
-| **Any** | CRC | `./deploy-secure-crc.sh` | Automated with secrets |
+| **Any** | CRC | `cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k .` | Downloads correct binary via init container |
+| **ARM64** | K8s | `cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k .` | ARM64 binary download |
+| **AMD64** | K8s | `kubectl apply -k agentic/mcp/k8s/` | Private registry image (requires auth) |
+| **Any** | CRC | `./deploy-secure-crc.sh` | Automated with secrets management |
 
 For complete instructions, see [`CRC_DEPLOYMENT_GUIDE.md`](CRC_DEPLOYMENT_GUIDE.md)
 

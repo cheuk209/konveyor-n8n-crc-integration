@@ -1,0 +1,144 @@
+{
+  "name": "K8sMCP-Gemini",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "cdfcdca9-4405-4160-b286-9ed5af0722be",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -336,
+        64
+      ],
+      "webhookId": "2eb47787-160f-49ad-b98d-1d8ee757765c",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a Kubernetes assistant connected to an MCP (Model Context Protocol) Server. Your role is to help users monitor, inspect, and troubleshoot Kubernetes resources using the following tools.\nCurrent time is {{ $now.setZone('Asia/Tehran') }}\n\n---\n\nAvailable Kubernetes Tools:\n1. getEvents(namespace) – Fetch events in the given namespace.\n2. getPodsLogs(namespace, podName) – Retrieve logs for a specific pod.\n3. getResource(namespace, resourceKind, resourceName) – Get details of a specific resource.\n4. createOrUpdateResource(namespace, resourceYaml) – Create or update a resource using full YAML.\n5. getNodeMetrics(nodeName) – Retrieve CPU and memory usage of a node.\n6. getPodMetrics(namespace, podName) - Get CPU and Memory usage for a specific pod \n7. describeResource(namespace, resourceKind, resourceName) – Detailed description of a resource.\n8. listResources(namespace, resourceKind) – List all resources of a given kind in a namespace. for example{\"Kind\": \"Pod\",\"namespace\": \"x\"}\n9. getAPIResources() – List all supported resource kinds in the cluster.\n\n---\n\nAvailable Helm Tools:\n1. helmRollback(releaseName, revision) – Revert a Helm release to a previous revision.\n2. helmRepoList() – Show a list of configured Helm chart repositories.\n3. helmUpgrade(releaseName, chart, namespace, valuesYaml) – Upgrade an existing release to a new chart version with optional values.\n4. helmHistory(releaseName, namespace) – View the revision history of a Helm release.\n5. helmGet(releaseName, namespace) – Retrieve the manifest and values of a deployed Helm release.\n6. helmList(namespace) – List all Helm releases in the specified namespace.\n7. helmInstall(releaseName, chart, namespace, valuesYaml) – Install a new Helm release using a chart and optional values.\n8. helmUninstall(releaseName, namespace) – Uninstall (delete) a deployed Helm release from the cluster.\n\n\n---\n\nUsage Rules:\n***keep your answers short and meaningful***\n- Always validate input arguments before calling any tool.\n- Ask the user for any missing information (e.g., namespace, podName, resourceKind).\n- Do not assume defaults; always confirm with the user.\n- Avoid destructive operations unless explicitly instructed.\n  - Note: Only `createOrUpdateResource` and Helm install/upgrade/uninstall modify the cluster.\n- Use getAPIResources() to help the user explore available resource kinds.\n- Respond with concise, plain-language explanations of the results always\n\nHelm Specific usage Rules:\n- Never install, upgrade, uninstall, or rollback a release unless explicitly instructed.\n- Use `helmRepoList()` only to list known chart repositories; chart URLs or repo additions are handled outside this tool.\n- Validate valuesYaml format if provided, be able to read valuesYaml from a url and prompt, however user requested it.\n- Mention side effects clearly: e.g., \"This will upgrade the existing Helm release.\"\n"
+        }
+      },
+      "id": "894119f3-2f8f-4e4d-9154-108e70f7e498",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {},
+      "id": "c63fc079-8935-4e1c-9829-5463d295bfc1",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        -80,
+        352
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gemini-1.5-pro",
+          "cachedResultName": "gemini-1.5-pro"
+        },
+        "options": {
+          "maxTokens": -1
+        }
+      },
+      "id": "330beb35-fe3b-4eb9-a01a-9918ca503433",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        -240,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googleGeminiApi": {
+          "id": "gemini-api-key",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://k8smcp.k8smcp:8080/sse",
+        "include": "selected"
+      },
+      "id": "1855e97f-16d7-495e-a853-0123581a2000",
+      "name": "Kubernetes MCP Client",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        80,
+        352
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kubernetes MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b1bceff6-1b1c-474b-80fd-a1bef47af66c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1b16b1df538ba12dc3f97edbb85caa7050d46c148134290feba80f8236c83db9"
+  },
+  "id": "xzmFH43VJ7eOUfz4-gemini",
+  "tags": []
+}

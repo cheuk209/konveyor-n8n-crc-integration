@@ -46,25 +46,25 @@
         "model": {
           "__rl": true,
           "mode": "list",
-          "value": "gpt-4o-mini",
-          "cachedResultName": "gpt-4o-mini"
+          "value": "gemini-1.5-pro",
+          "cachedResultName": "gemini-1.5-pro"
         },
         "options": {
           "maxTokens": -1
         }
       },
       "id": "330beb35-fe3b-4eb9-a01a-9918ca503433",
-      "name": "OpenAI Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "position": [
         -240,
         320
       ],
-      "typeVersion": 1.2,
+      "typeVersion": 1,
       "credentials": {
-        "openAiApi": {
-          "id": "9h8DAHxZuyWTyAqh",
-          "name": "OpenAi account"
+        "googleGeminiApi": {
+          "id": "gemini-api-key",
+          "name": "Google Gemini API"
         }
       }
     },

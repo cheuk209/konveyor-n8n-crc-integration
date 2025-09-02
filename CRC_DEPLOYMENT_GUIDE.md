@@ -339,8 +339,8 @@ This project supports multiple deployment configurations based on your system ar
 
 | Architecture | Cluster Type | Kustomization File | MCP Deployment File | Notes |
 |-------------|-------------|-------------------|-------------------|-------|
-| **ARM64 (Mac M1)** | CRC | `kustomization-crc.yaml` | `k8smcp-deployment-arm64.yaml` | Uses init container to download ARM64 binary |
-| **AMD64/x86_64** | CRC | `kustomization-crc.yaml` | `k8smcp-deployment-crc.yaml` | Uses Quay.io image (requires auth) |
+| **Any Architecture** | CRC | `kustomization-crc.yaml` | `k8smcp-deployment-arm64.yaml` | Uses init container to download appropriate binary |
+| **AMD64/x86_64** | CRC (Legacy) | Custom | `k8smcp-deployment-crc.yaml` | Uses Quay.io image (requires auth) |
 | **ARM64** | Standard K8s | `kustomization-arm64.yaml` | `k8smcp-deployment-arm64.yaml` | External service instead of OpenShift Route |
 | **AMD64/x86_64** | Standard K8s | `kustomization.yaml` | `k8smcp-deployment.yaml` | Uses private registry image |
 
@@ -349,11 +349,8 @@ This project supports multiple deployment configurations based on your system ar
 Choose the appropriate command for your system:
 
 ```bash
-# Mac M1/ARM64 + CRC (Most Common)
+# Any Architecture + CRC (Mac M1, Intel, Linux) 
 cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k . && cd ../../..
-
-# Intel Mac/Linux + CRC  
-oc apply -k agentic/mcp/k8s/
 
 # ARM64 + Standard Kubernetes
 cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k . && cd ../../..
