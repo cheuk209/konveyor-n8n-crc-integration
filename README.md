@@ -1,8 +1,3 @@
-podman run --rm -v kubeconfig:/kubeconfig -v $HOME/.kube/config:/tmp/config:ro alpine sh -c "cp /tmp/config /kubeconfig/config"
-podman run -d --name k8smcp_test -p 8080:8080 -v kubeconfig:/root/.kube:ro localhost/k8smcp:v1
-oc apply -k .
-podman build -t n8n
-oc apply -k .
 
 # Konveyor N8N Integration
 
@@ -22,33 +17,66 @@ The integration allows you to chat with an AI agent that can inspect, monitor, a
 
 ### Prerequisites
 
-- Kubernetes cluster (AKS, EKS, or local)
+- Kubernetes cluster or OpenShift CRC
+- 16GB+ RAM (12GB for CRC)
 - `kubectl` or `oc` CLI configured
 - Container runtime (Podman or Docker)
 - N8N workflow (`K8sMCP.json` included)
 
-### 🚀 First Steps
+### 🚀 Quick Deployment
 
-1. **Deploy MCP Server to Kubernetes:**
-   ```bash
-   cd agentic/mcp/k8s
-   kubectl apply -k .
-   ```
+Choose your deployment method based on your system:
 
-2. **Deploy N8N with PostgreSQL to Kubernetes:**
-   ```bash
-   cd ../../n8n/k8s/postgres
-   kubectl apply -k .
-   cd ..
-   kubectl apply -k .
-   ```
+#### Option 1: OpenShift CRC (Recommended for local development)
+```bash
+# For Mac M1/ARM64 users:
+crc config set memory 12288
+crc start
+eval $(crc oc-env)
+cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k . && cd ../../..
 
-3. **Access N8N:**
-   - Get the service IP: `kubectl get svc -n n8n`
-   - Import the workflow: Upload `K8sMCP.json` to N8N
-   - Configure OpenAI credentials in N8N
+# For Intel/AMD64 users:  
+crc start --memory 12288
+eval $(crc oc-env)
+oc apply -k agentic/mcp/k8s/
+```
 
-4. **Start chatting with your Kubernetes cluster!**
+#### Option 2: Standard Kubernetes
+```bash
+# For ARM64 systems (Mac M1, ARM Linux):
+cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k . && cd ../../..
+
+# For AMD64/x86_64 systems:
+kubectl apply -k agentic/mcp/k8s/
+```
+
+#### Option 3: Automated CRC Deployment
+```bash
+# Complete setup with secrets management
+chmod +x deploy-secure-crc.sh
+./deploy-secure-crc.sh
+```
+
+### 🎯 Access Applications
+- **N8N UI**: `https://n8n-n8n.apps-crc.testing` (CRC) or your cluster's service IP
+- **MCP Server**: `https://k8smcp-k8smcp.apps-crc.testing` (CRC)
+- Import `K8sMCP.json` workflow into N8N
+- Configure OpenAI credentials in N8N settings
+
+### 💬 Start Chatting!
+Once deployed, you can chat with your AI agent to manage Kubernetes resources using natural language.
+
+## 📋 Deployment Reference
+
+| System | Platform | Command | Notes |
+|--------|----------|---------|-------|
+| **Mac M1** | CRC | `cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k .` | ARM64 with init container |
+| **Intel Mac** | CRC | `oc apply -k agentic/mcp/k8s/` | Uses default kustomization |
+| **ARM64 Linux** | K8s | `cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k .` | ARM64 binary download |
+| **AMD64 Linux** | K8s | `kubectl apply -k agentic/mcp/k8s/` | Private registry image |
+| **Any** | CRC | `./deploy-secure-crc.sh` | Automated with secrets |
+
+For complete instructions, see [`CRC_DEPLOYMENT_GUIDE.md`](CRC_DEPLOYMENT_GUIDE.md)
 
 ---
 
@@ -58,10 +86,14 @@ The integration allows you to chat with an AI agent that can inspect, monitor, a
 ```
 agentic/
 ├── mcp/k8s/           # MCP Server Kubernetes manifests
-│   ├── k8smcp-deployment.yaml
+│   ├── k8smcp-deployment-arm64.yaml     # ARM64 deployment (Mac M1)
+│   ├── k8smcp-deployment-crc.yaml       # CRC/AMD64 deployment  
+│   ├── k8smcp-deployment.yaml           # Standard K8s/AMD64
 │   ├── k8smcp-service.yaml
 │   ├── k8smcp-namespace.yaml
-│   └── kustomization.yaml
+│   ├── kustomization.yaml              # Default (AMD64)
+│   ├── kustomization-crc.yaml          # CRC-specific
+│   └── kustomization-arm64.yaml        # ARM64-specific
 └── n8n/k8s/          # N8N Kubernetes manifests
     ├── n8n-deployment.yaml
     ├── n8n-service.yaml

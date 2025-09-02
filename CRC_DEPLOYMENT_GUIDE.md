@@ -23,10 +23,10 @@ This guide provides comprehensive instructions for deploying the Konveyor N8N In
 ## Prerequisites
 
 ### System Requirements
-- **RAM**: Minimum 16GB (CRC requires 9GB)
-- **CPU**: 4+ cores
+- **RAM**: Minimum 16GB (CRC requires 12GB for this deployment)
+- **CPU**: 4+ cores  
 - **Storage**: 35GB+ free space
-- **OS**: macOS, Linux, or Windows with WSL2
+- **OS**: macOS (ARM64/Intel), Linux, or Windows with WSL2
 
 ### Software Requirements
 ```bash
@@ -46,22 +46,52 @@ sudo mv oc kubectl /usr/local/bin/
 
 ## Quick Start
 
-### 1. Prepare Secrets
+### Option 1: Automated Deployment (Recommended)
 ```bash
-# Copy template
+# 1. Prepare secrets
 cp .env.secrets.template .env.secrets
+nano .env.secrets  # Edit with your credentials
 
-# Edit with your credentials
-nano .env.secrets
+# 2. Run deployment script
+chmod +x deploy-secure-crc.sh
+./deploy-secure-crc.sh
 ```
 
-### 2. Run Deployment
-```bash
-# Make script executable
-chmod +x deploy-secure-crc.sh
+### Option 2: Manual Kustomize Deployment
 
-# Deploy everything
-./deploy-secure-crc.sh
+**For Mac M1/ARM64 CRC (Most Common):**
+```bash
+# Setup CRC with 12GB memory for n8n compatibility
+crc config set memory 12288
+crc start
+
+# Deploy MCP Server and dependencies
+eval $(crc oc-env)
+cd agentic/mcp/k8s/
+cp kustomization-crc.yaml kustomization.yaml
+oc apply -k .
+cd ../../..
+
+# Deploy N8N (use existing deployment script for n8n part)
+# Or manually apply n8n manifests from n8n/ directory
+```
+
+**For Intel/AMD64 CRC:**
+```bash
+# Setup CRC 
+crc start --memory 12288
+
+# Deploy with original kustomization (uses AMD64 images)
+eval $(crc oc-env) 
+oc apply -k agentic/mcp/k8s/  # Uses default kustomization.yaml
+```
+
+**For other ARM64 Kubernetes clusters (non-CRC):**
+```bash
+# Deploy with ARM64 kustomization
+cd agentic/mcp/k8s/
+cp kustomization-arm64.yaml kustomization.yaml
+kubectl apply -k .
 ```
 
 ### 3. Access Applications
@@ -300,6 +330,49 @@ For production:
 - Configure PostgreSQL replication
 - Use external load balancer
 - Implement backup/restore procedures
+
+## Architecture-Specific Deployment Reference
+
+This project supports multiple deployment configurations based on your system architecture and cluster type:
+
+### Deployment Options Summary
+
+| Architecture | Cluster Type | Kustomization File | MCP Deployment File | Notes |
+|-------------|-------------|-------------------|-------------------|-------|
+| **ARM64 (Mac M1)** | CRC | `kustomization-crc.yaml` | `k8smcp-deployment-arm64.yaml` | Uses init container to download ARM64 binary |
+| **AMD64/x86_64** | CRC | `kustomization-crc.yaml` | `k8smcp-deployment-crc.yaml` | Uses Quay.io image (requires auth) |
+| **ARM64** | Standard K8s | `kustomization-arm64.yaml` | `k8smcp-deployment-arm64.yaml` | External service instead of OpenShift Route |
+| **AMD64/x86_64** | Standard K8s | `kustomization.yaml` | `k8smcp-deployment.yaml` | Uses private registry image |
+
+### Single Command Deployments
+
+Choose the appropriate command for your system:
+
+```bash
+# Mac M1/ARM64 + CRC (Most Common)
+cd agentic/mcp/k8s && cp kustomization-crc.yaml kustomization.yaml && oc apply -k . && cd ../../..
+
+# Intel Mac/Linux + CRC  
+oc apply -k agentic/mcp/k8s/
+
+# ARM64 + Standard Kubernetes
+cd agentic/mcp/k8s && cp kustomization-arm64.yaml kustomization.yaml && kubectl apply -k . && cd ../../..
+
+# AMD64 + Standard Kubernetes (requires private registry access)
+kubectl apply -k agentic/mcp/k8s/
+```
+
+### Key Differences by Architecture
+
+**ARM64 Deployments:**
+- Download official ARM64 binary at pod startup using init container
+- No dependency on private container registries
+- Works on Mac M1, ARM64 Linux, and ARM-based cloud instances
+
+**AMD64 Deployments:**  
+- Use pre-built container images from private registries
+- Require image pull secrets for authentication
+- Faster startup (no binary download needed)
 
 ## Clean Up
 

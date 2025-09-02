@@ -5,7 +5,7 @@ resources:
   - k8smcp-namespace.yaml
   - k8smcp-serviceaccount.yaml
   - k8smcp-ca-clusterrolebinding.yaml
-  - k8smcp-deployment-crc.yaml
+  - k8smcp-deployment-arm64.yaml  # ARM64 deployment with init container for Mac M1
   - k8smcp-internal-service.yaml
   - k8smcp-route.yaml
   - k8smcp-scc.yaml
