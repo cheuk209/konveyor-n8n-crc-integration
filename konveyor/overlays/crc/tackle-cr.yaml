@@ -1,0 +1,31 @@
+apiVersion: tackle.konveyor.io/v1alpha1
+kind: Tackle
+metadata:
+  name: tackle
+  namespace: konveyor-tackle
+spec:
+  feature_auth_required: false
+  resource_requirements: minimal
+  # CRC-optimized resource settings
+  hub_database_volume_size: 1Gi
+  hub_bucket_volume_size: 5Gi
+  cache_data_volume_size: 1Gi
+  cache_worker_volume_size: 1Gi
+  pathfinder_database_volume_size: 1Gi
+  # Disable components not needed for demo
+  feature_pathfinder: false
+  # Resource limits for CRC - ultra minimal
+  hub_resource_requirements:
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+    requests:
+      memory: "256Mi"
+      cpu: "50m"
+  ui_resource_requirements:
+    limits:
+      memory: "256Mi"
+      cpu: "100m"
+    requests:
+      memory: "128Mi"
+      cpu: "25m"

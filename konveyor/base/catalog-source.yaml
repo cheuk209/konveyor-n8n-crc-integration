@@ -1,0 +1,15 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: konveyor
+  namespace: openshift-marketplace
+spec:
+  displayName: Konveyor Operator
+  publisher: Konveyor
+  sourceType: grpc
+  image: quay.io/konveyor/tackle2-operator-index:latest
+  grpcPodConfig:
+    securityContextConfig: legacy
+  updateStrategy:
+    registryPoll:
+      interval: 10m

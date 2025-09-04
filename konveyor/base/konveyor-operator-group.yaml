@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: konveyor-operator-group
+  namespace: konveyor-tackle
+spec:
+  targetNamespaces:
+  - konveyor-tackle
