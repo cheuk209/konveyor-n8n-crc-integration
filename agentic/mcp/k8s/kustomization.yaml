@@ -1,10 +1,13 @@
-resources:
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 
+resources:
   - k8smcp-namespace.yaml
   - k8smcp-serviceaccount.yaml
   - k8smcp-ca-clusterrolebinding.yaml
-  - quay-io-dkcapgemini-image-pull.yaml
-  - k8smcp-kubeconfig.yaml
-  - k8smcp-deployment.yaml
+  - k8smcp-deployment-arm64.yaml  # ARM64 deployment with init container for Mac M1
   - k8smcp-internal-service.yaml
-  - k8smcp-external-service.yaml
+  - k8smcp-route.yaml
+  - k8smcp-scc.yaml
+  # Remove or comment out if not using private registry
+  # - quay-io-dkcapgemini-image-pull.yaml
